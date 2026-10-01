@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="CYBERSATHI blockchain security operations console" />
+    <title>CYBERSATHI | Blockchain Security Operations</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand"><div class="brand-mark"><span></span><span></span><span></span></div><div><strong>CYBERSATHI</strong><small>Blockchain defense</small></div></div>
+        <div class="sidebar-label">Operations</div>
+        <nav class="nav-links" aria-label="Security modules">
+          <button class="nav-link active" data-module="overview"><span class="nav-icon">◈</span>Command center</button>
+          <button class="nav-link" data-module="threat-intelligence"><span class="nav-icon">◎</span>Threat intelligence</button>
+          <button class="nav-link" data-module="attack-investigation"><span class="nav-icon">⌕</span>Attack investigation</button>
+          <button class="nav-link" data-module="blockchain-explorer"><span class="nav-icon">◇</span>Blockchain explorer</button>
+          <button class="nav-link" data-module="node-management"><span class="nav-icon">▣</span>Node management</button>
+          <button class="nav-link" data-module="wallet-intelligence"><span class="nav-icon">◌</span>Wallet intelligence</button>
+          <button class="nav-link" data-module="incident-response"><span class="nav-icon">!</span>Incident response</button>
+          <button class="nav-link" data-module="attack-dna"><span class="nav-icon">⌬</span>Attack DNA</button>
+          <button class="nav-link" data-module="ai-copilot"><span class="nav-icon">✦</span>AI copilot</button>
+        </nav>
+        <div class="sidebar-footer"><span class="online-dot"></span><span>Telemetry connected</span><code>v2.0.0</code></div>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <div class="mobile-brand"><button class="icon-btn" id="menuToggle" aria-label="Open navigation">☰</button><span>CYBERSATHI</span></div>
+          <div class="page-heading"><span class="kicker">Security operations / <span id="breadcrumb">Overview</span></span><h1 id="pageTitle">Command center</h1></div>
+          <div class="topbar-actions"><span class="last-sync" id="lastSync">Waiting for telemetry</span><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button><button class="icon-btn" id="commandToggle" type="button" aria-label="Open command palette">⌘</button><button class="report-btn" id="reportButton" type="button">Export JSON <span>↗</span></button><button class="report-btn pdf-btn" id="pdfButton" type="button">Export PDF <span>↓</span></button></div>
+        </header>
+        <div class="status-banner" id="statusBanner" role="status"><span class="status-dot"></span><span id="statusText">Loading verified telemetry...</span></div>
+
+        <section class="hero-row">
+          <div class="hero-copy"><span class="kicker accent">Live posture</span><h2>Know what changed.<br /><em>Act with confidence.</em></h2><p id="briefCopy">Loading the latest evidence across wallets, nodes, validators, and bridge infrastructure.</p><div class="hero-actions"><button class="primary-btn" data-action="run-scan">Run integrity scan <span>→</span></button><button class="text-btn" data-module="incident-response">Review incidents <span>↗</span></button></div></div>
+          <div class="posture-card"><div class="card-top"><span>Current threat posture</span><span class="posture-badge" id="threatLevel">--</span></div><div class="score-ring"><div><strong id="securityScore">--</strong><small>/ 100</small></div></div><div class="score-meta"><span>Security score</span><span id="scoreDelta">Operational baseline</span></div></div>
+        </section>
+
+        <section class="kpi-grid" aria-label="Security metrics">
+          <article class="kpi-card"><span class="kpi-label">Blockchain health</span><strong id="blockchainHealth">--</strong><small class="positive">● Network stable</small></article>
+          <article class="kpi-card"><span class="kpi-label">Prediction confidence</span><strong id="predictionConfidence">--</strong><small>Model confidence</small></article>
+          <article class="kpi-card"><span class="kpi-label">Live nodes</span><strong id="liveNodes">--</strong><small>Across infrastructure</small></article>
+          <article class="kpi-card"><span class="kpi-label">Active incidents</span><strong id="activeIncidents">--</strong><small class="warning">● Needs review</small></article>
+          <article class="kpi-card"><span class="kpi-label">Flagged wallets</span><strong id="flaggedWallets">--</strong><small>Of <span id="monitoredWallets">--</span> monitored</small></article>
+        </section>
+
+        <section class="analysis-workbench" aria-labelledby="analysisTitle">
+          <div class="workbench-heading"><div><span class="kicker accent">Local analysis</span><h2 id="analysisTitle">Check a URL, email, or password</h2><p>Deterministic rules run locally. Nothing is sent to an external service.</p></div><span class="panel-tag">Offline rules</span></div>
+          <div class="analysis-grid">
+            <form class="analysis-card" data-analysis-type="url">
+              <label for="urlInput">URL safety</label><input id="urlInput" name="url" type="url" placeholder="https://example.com" autocomplete="url" required maxlength="2048" />
+              <button class="primary-btn analysis-submit" type="submit">Analyze URL <span>→</span></button><p class="analysis-status" aria-live="polite"></p><div class="analysis-result hidden" aria-live="polite"></div>
+            </form>
+            <form class="analysis-card" data-analysis-type="email">
+              <label for="emailInput">Email reputation</label><input id="emailInput" name="email" type="email" placeholder="name@example.com" autocomplete="email" required maxlength="320" />
+              <button class="primary-btn analysis-submit" type="submit">Analyze email <span>→</span></button><p class="analysis-status" aria-live="polite"></p><div class="analysis-result hidden" aria-live="polite"></div>
+            </form>
+            <form class="analysis-card" data-analysis-type="password">
+              <label for="passwordInput">Password strength</label><input id="passwordInput" name="password" type="password" placeholder="Enter a password to check" autocomplete="new-password" required maxlength="256" />
+              <button class="primary-btn analysis-submit" type="submit">Analyze password <span>→</span></button><p class="analysis-status" aria-live="polite"></p><div class="analysis-result hidden" aria-live="polite"></div>
+            </form>
+          </div>
+        </section>
+
+        <section class="dashboard-grid" id="overviewView">
+          <article class="panel trend-panel"><div class="panel-heading"><div><span class="kicker">Risk movement</span><h3>Threat pressure</h3></div><span class="panel-tag">Last 24 hours</span></div><div class="trend-chart" id="trendChart" aria-label="Threat pressure chart"></div><div class="chart-axis" id="trendLabels"></div></article>
+          <article class="panel signals-panel"><div class="panel-heading"><div><span class="kicker">Explainability</span><h3>Why the score moved</h3></div><span class="panel-tag">AI / 91%</span></div><div class="signal-list" id="signalList"></div></article>
+          <article class="panel nodes-panel"><div class="panel-heading"><div><span class="kicker">Infrastructure</span><h3>Node health</h3></div><button class="small-btn" data-module="node-management">View all</button></div><div class="node-list" id="nodeList"></div></article>
+          <article class="panel incidents-panel"><div class="panel-heading"><div><span class="kicker">Response queue</span><h3>Active incidents</h3></div><button class="small-btn" data-module="incident-response">Open queue</button></div><div class="incident-list" id="incidentList"></div></article>
+        </section>
+
+        <section class="module-view hidden" id="moduleView" aria-live="polite"><div class="module-header"><div><span class="kicker" id="moduleEyebrow">Module</span><h2 id="moduleTitle">Threat intelligence</h2><p id="moduleDescription"></p></div><button class="small-btn" data-module="overview">← Back to overview</button></div><div class="module-metrics" id="moduleMetrics"></div><div class="module-columns"><div class="panel"><div class="panel-heading"><div><span class="kicker">Evidence</span><h3>Relevant signals</h3></div></div><div class="signal-list" id="moduleSignals"></div></div><div class="panel module-actions"><div class="panel-heading"><div><span class="kicker">Operator controls</span><h3>Recommended actions</h3></div></div><div id="moduleActions"></div></div></div></section>
+      </main>
+    </div>
+    <div class="modal-backdrop hidden" id="commandModal"><div class="command-modal"><div class="modal-heading"><div><span class="kicker">Quick actions</span><h2>Command palette</h2></div><button class="close-btn" id="closeCommand">×</button></div><input id="commandInput" type="search" placeholder="Search an action..." /><div class="command-list"><button data-action="run-scan"><span>◎</span>Run integrity scan<kbd>⌘ 1</kbd></button><button data-action="isolate-wallet"><span>◌</span>Isolate wallet group<kbd>⌘ 2</kbd></button><button data-action="freeze-node"><span>▣</span>Prepare node freeze<kbd>⌘ 3</kbd></button><button data-action="escalate-incident"><span>!</span>Escalate priority incident<kbd>⌘ 4</kbd></button><button data-action="generate-report"><span>↗</span>Export security report<kbd>⌘ 5</kbd></button></div></div></div>
+    <div class="toast hidden" id="toast"></div>
+    <button class="shravi-launcher" id="shraviLauncher" type="button" aria-label="Open Shravi.ai assistant"><span>✦</span><strong>Shravi.ai</strong></button>
+    <aside class="shravi-panel hidden" id="shraviPanel" aria-label="Shravi.ai assistant"><div class="shravi-header"><div><span class="kicker accent">Security copilot</span><h2>Shravi.ai</h2><small>Evidence-led answers for your SOC</small></div><button class="close-btn" id="closeShravi" type="button">×</button></div><div class="shravi-quick"><button type="button" data-shravi-prompt="Why is the security score high?">Explain score</button><button type="button" data-shravi-prompt="What should I fix first?">Prioritize fixes</button><button type="button" data-shravi-prompt="What evidence identifies an attacker?">Attribution evidence</button></div><div class="shravi-messages" id="shraviMessages"><div class="shravi-message assistant">Hi, I’m Shravi.ai. I connect every answer to current telemetry, confidence, evidence, and next steps.</div></div><form class="shravi-form" id="shraviForm"><input id="shraviInput" autocomplete="off" placeholder="Ask about the current posture..." /><button type="submit" aria-label="Send message">↑</button></form></aside>
+    <script src="/static/app.js?v=20260908-1"></script>
+  </body>
+</html>
