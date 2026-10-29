@@ -8,6 +8,9 @@ def test_root_page_renders():
     response = client.get('/')
     assert response.status_code == 200
     assert 'CYBERSATHI' in response.text
+    assert 'Security observatory' in response.text
+    assert 'does not connect to a live blockchain' in response.text
+    assert 'not a reputation lookup or a guarantee of safety' in response.text
 
 
 def test_telemetry_payload():
@@ -17,6 +20,7 @@ def test_telemetry_payload():
     payload = response.json()
     assert payload['threat_level'] in {'Critical', 'High', 'Elevated'}
     assert payload['live_nodes'] >= 0
+    assert payload['data_mode'] == 'illustrative_demo'
     assert 'executive_brief' in payload
     assert 'attack_investigation' in payload
     assert 'wallet_intelligence' in payload
@@ -28,8 +32,10 @@ def test_security_actions_and_report():
     report = client.get('/api/report')
     assert action.status_code == 200
     assert action.json()['status'] == 'accepted'
+    assert 'no wallet activity is changed' in action.json()['detail']
     assert report.status_code == 200
     assert report.json()['report_name'] == 'CYBERSATHI Blockchain Security Report'
+    assert report.json()['data_mode'] == 'illustrative_demo'
 
 
 def test_dashboard_modules_are_actionable():
@@ -40,6 +46,7 @@ def test_dashboard_modules_are_actionable():
     invalid_action = client.post('/api/actions', json={'action': 'not-an-action'})
     assert dashboard.status_code == 200
     assert dashboard.json()['summary']['security_score'] == 88
+    assert dashboard.json()['data_mode'] == 'illustrative_demo'
     assert module.status_code == 200
     assert module.json()['module']['label'] == 'Wallet Intelligence'
     assert invalid_module.status_code == 404
@@ -55,6 +62,11 @@ def test_integrity_scan_returns_findings():
     assert payload['scan']['security_score'] == 88
     assert payload['scan']['nodes_checked'] == 4
     assert payload['scan']['findings'] == 2
+    assert payload['scan']['wallets_in_snapshot'] == 284
+    assert 'no live systems were scanned' in payload['detail']
+    assert 'Gateway-03 (86%) requires review' in payload['scan']['finding_summary']
+    assert 'Bridge-04 (61%) requires review' in payload['scan']['finding_summary']
+    assert 'all other monitored nodes' not in payload['scan']['finding_summary']
 
 
 def test_legacy_get_integrity_scan_is_compatible():

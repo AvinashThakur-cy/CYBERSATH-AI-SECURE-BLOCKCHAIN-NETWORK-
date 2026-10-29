@@ -13,7 +13,7 @@ const moduleLabels = {
 };
 
 const actionLabels = {
-  'run-scan': 'Run integrity scan',
+  'run-scan': 'Review sample snapshot',
   'isolate-wallet': 'Isolate wallet group',
   'freeze-node': 'Prepare node freeze',
   'escalate-incident': 'Escalate priority incident',
@@ -85,10 +85,17 @@ function renderIncidents(incidents) {
 }
 
 function renderDashboard(data) {
+  const score = Number(data.summary.security_score);
+  if (!Number.isFinite(score) || score < 0 || score > 100) {
+    throw new Error('Dashboard returned an invalid security score');
+  }
   state.dashboard = data;
   const summary = data.summary;
+  const topSignal = data.signals[0];
   $('#threatLevel').textContent = summary.threat_level;
-  $('#securityScore').textContent = summary.security_score;
+  $('#securityScore').textContent = score;
+  $('#scoreRing').style.setProperty('--score', `${score}%`);
+  $('#scoreRing').setAttribute('aria-label', `Sample security score: ${score} out of 100`);
   $('#blockchainHealth').textContent = `${summary.blockchain_health}%`;
   $('#predictionConfidence').textContent = `${summary.prediction_confidence}%`;
   $('#liveNodes').textContent = summary.live_nodes;
@@ -96,8 +103,9 @@ function renderDashboard(data) {
   $('#flaggedWallets').textContent = summary.flagged_wallets;
   $('#monitoredWallets').textContent = summary.monitored_wallets;
   $('#briefCopy').textContent = data.executive_brief;
-  $('#lastSync').textContent = `Synced ${new Date(data.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-  $('#statusText').textContent = `Telemetry verified · ${summary.active_incidents} incidents require review`;
+  $('#lastSync').textContent = `Snapshot updated ${new Date(data.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  $('#statusText').textContent = `Illustrative snapshot loaded · ${summary.active_incidents} sample incidents`;
+  $('#signalConfidence').textContent = topSignal ? `Top sample signal · ${topSignal.score}%` : 'No sample signals';
   renderTrend(data.risk_trend);
   renderSignals(data.signals);
   renderNodes(data.nodes);
@@ -128,6 +136,14 @@ async function loadDashboard() {
   }
 }
 
+function formatModuleMetric(key, value) {
+  if (key === 'security_score') return `${value}/100`;
+  if (['confidence', 'health', 'integrity', 'trust_score'].some((unit) => key.includes(unit))) {
+    return `${value}%`;
+  }
+  return value;
+}
+
 async function openModule(moduleId) {
   state.module = moduleId;
   document.querySelectorAll('[data-module]').forEach((item) => item.classList.toggle('active', item.dataset.module === moduleId));
@@ -148,9 +164,9 @@ async function openModule(moduleId) {
     $('#moduleEyebrow').textContent = result.module.eyebrow;
     $('#moduleTitle').textContent = result.module.label;
     $('#moduleDescription').textContent = result.module.description;
-    $('#moduleMetrics').innerHTML = Object.entries(result.metrics).map(([key, value]) => `<div class="module-metric"><span>${key.replaceAll('_', ' ')}</span><strong>${value}${key.includes('confidence') || key.includes('integrity') ? '%' : ''}</strong></div>`).join('');
+    $('#moduleMetrics').innerHTML = Object.entries(result.metrics).map(([key, value]) => `<div class="module-metric"><span>${key.replaceAll('_', ' ')}</span><strong>${formatModuleMetric(key, value)}</strong></div>`).join('');
     renderSignals(result.signals, '#moduleSignals');
-    $('#moduleActions').innerHTML = result.module.actions.map((action) => `<button class="action-card" data-action="${action}"><span>${action === 'generate-report' ? '↗' : '◎'}</span><div><strong>${actionLabels[action]}</strong><small>Execute with current evidence</small></div><b>→</b></button>`).join('');
+    $('#moduleActions').innerHTML = result.module.actions.map((action) => `<button class="action-card" data-action="${action}"><span>${action === 'generate-report' ? '↗' : '◎'}</span><div><strong>${actionLabels[action]}</strong><small>Demo action · no live system changes</small></div><b>→</b></button>`).join('');
     bindActionButtons();
   } catch (error) {
     setStatus(error.message, 'error');
@@ -165,7 +181,7 @@ async function executeAction(action, target = null) {
     if (!response.ok) throw new Error(result.detail || 'Action rejected');
     const scanMessage = result.scan ? ` Score ${result.scan.security_score}/100 · ${result.scan.findings} finding(s). ${result.scan.finding_summary}` : result.detail;
     showToast(`${result.title}: ${scanMessage}`);
-    setStatus(`${result.title} · audit event recorded`, 'success');
+    setStatus(`${result.title} · demo response only`, 'success');
   } catch (error) {
     showToast(error.message, 'error');
     setStatus(`Action failed · ${error.message}`, 'error');

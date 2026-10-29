@@ -62,6 +62,7 @@ def now_iso() -> str:
 def build_dashboard() -> dict:
     return {
         "generated_at": now_iso(),
+        "data_mode": "illustrative_demo",
         "summary": {
             "threat_level": "High",
             "security_score": 88,
@@ -74,7 +75,7 @@ def build_dashboard() -> dict:
             "monitored_wallets": 284,
             "flagged_wallets": 7,
         },
-        "executive_brief": "CYBERSATHI detected elevated bridge activity and a validator rotation anomaly. No confirmed asset loss is present; operator approval is required before containment changes are applied.",
+        "executive_brief": "Illustrative sample: elevated bridge activity and a validator rotation anomaly are shown for demonstration. This snapshot does not query a live chain or confirm asset loss.",
         "risk_trend": {
             "labels": ["00:00", "04:00", "08:00", "12:00", "16:00", "20:00"],
             "values": [42, 48, 39, 58, 72, 67],
@@ -117,11 +118,11 @@ MODULES = {
 }
 
 ACTION_RESULTS = {
-    "run-scan": ("Integrity scan completed", "Chain, wallet, and node checks completed against the current telemetry snapshot."),
-    "isolate-wallet": ("Wallet isolation prepared", "Outgoing activity for the selected wallet group is marked for operator approval."),
-    "freeze-node": ("Node freeze prepared", "The affected infrastructure is staged for controlled isolation."),
-    "escalate-incident": ("Incident escalated", "INC-2048 has been assigned priority response status."),
-    "generate-report": ("Report prepared", "The latest findings and recommended controls are ready to export."),
+    "run-scan": ("Sample snapshot reviewed", "Sample node health was compared with the dashboard's 90% review threshold; no live systems were scanned."),
+    "isolate-wallet": ("Wallet isolation prepared", "This demo action records a preparation message only; no wallet activity is changed."),
+    "freeze-node": ("Node freeze prepared", "This demo action records a preparation message only; no infrastructure is changed."),
+    "escalate-incident": ("Escalation preview generated", "Demo only: INC-2048 would be assigned priority response; no incident state is changed."),
+    "generate-report": ("Report prepared", "The illustrative dashboard snapshot and recommended controls are ready to export."),
 }
 
 
@@ -197,14 +198,19 @@ async def run_action(request: ActionRequest) -> dict:
     if request.action == "run-scan":
         dashboard_data = build_dashboard()
         nodes = dashboard_data["nodes"]
+        nodes_requiring_review = [node for node in nodes if node["health"] < 90]
         response["scan"] = {
             "status": "completed",
             "security_score": dashboard_data["summary"]["security_score"],
             "blockchain_health": dashboard_data["summary"]["blockchain_health"],
             "nodes_checked": len(nodes),
-            "wallets_checked": dashboard_data["summary"]["monitored_wallets"],
-            "findings": sum(1 for node in nodes if node["health"] < 90),
-            "finding_summary": "Bridge-04 requires review; all other monitored nodes are within operating thresholds.",
+            "wallets_in_snapshot": dashboard_data["summary"]["monitored_wallets"],
+            "findings": len(nodes_requiring_review),
+            "finding_summary": (
+                "; ".join(f"{node['name']} ({node['health']}%) requires review" for node in nodes_requiring_review)
+                if nodes_requiring_review
+                else "No sampled nodes fell below the 90% health threshold."
+            ),
         }
     return response
 
@@ -221,6 +227,7 @@ async def security_report() -> dict:
     return {
         "report_name": "CYBERSATHI Blockchain Security Report",
         "generated_at": now_iso(),
+        "data_mode": data["data_mode"],
         "risk_level": data["summary"]["threat_level"],
         "overall_score": data["summary"]["security_score"],
         "executive_brief": data["executive_brief"],
@@ -243,7 +250,7 @@ async def security_report_pdf() -> StreamingResponse:
     title_style = ParagraphStyle("CyberSathiTitle", parent=styles["Title"], fontName="Helvetica-Bold", fontSize=22, textColor=colors.HexColor("#17352b"), spaceAfter=6)
     body_style = ParagraphStyle("CyberSathiBody", parent=styles["BodyText"], fontName="Helvetica", fontSize=9, leading=13, textColor=colors.HexColor("#30453d"))
     small_style = ParagraphStyle("CyberSathiSmall", parent=body_style, fontSize=8, leading=10)
-    story = [Paragraph("CYBERSATHI", title_style), Paragraph("Blockchain Security Operations Report", styles["Heading2"]), Paragraph(f"Generated {data['generated_at']}", small_style), Spacer(1, 8)]
+    story = [Paragraph("CYBERSATHI", title_style), Paragraph("Blockchain Security Operations Report", styles["Heading2"]), Paragraph(f"Generated {data['generated_at']}", small_style), Paragraph("Illustrative demo snapshot — this report does not represent live chain telemetry.", small_style), Spacer(1, 8)]
     story.append(Paragraph("Executive assessment", styles["Heading2"]))
     story.append(Paragraph(data["executive_brief"], body_style))
     story.append(Spacer(1, 10))
@@ -306,15 +313,15 @@ async def shravi_chat(request: ChatRequest) -> dict:
     elif any(word in message for word in ["scan", "score", "health", "status"]):
         intent = "Current security posture"
         confidence = "High"
-        answer = f"The latest verified snapshot is {data['summary']['security_score']}/100 security, {data['summary']['blockchain_health']}% blockchain health, and {data['summary']['active_incidents']} active incidents. Bridge-04 is the main infrastructure concern."
+        answer = f"The current illustrative snapshot is {data['summary']['security_score']}/100 security, {data['summary']['blockchain_health']}% blockchain health, and {data['summary']['active_incidents']} sample incidents. Bridge-04 is the main infrastructure concern in this demo data."
         evidence = [f"Security score: {data['summary']['security_score']}/100", f"Blockchain health: {data['summary']['blockchain_health']}%", f"Active incidents: {data['summary']['active_incidents']}"]
         next_steps = ["Run an integrity scan", "Review Bridge-04 evidence", "Open the incident response queue"]
         suggested_action = "run-scan"
     elif any(word in message for word in ["report", "pdf", "export"]):
         intent = "Reporting help"
         confidence = "High"
-        answer = "Use Export PDF Report for the full report. It contains the score summary, graphical risk movement, explainable findings, node health, incidents, controls, and attribution limitations."
-        evidence = ["PDF report uses the current verified telemetry snapshot", "Graphical risk movement is included", "Attribution limitations are documented"]
+        answer = "Use Export PDF Report for the full report. It contains the score summary, graphical risk movement, explainable findings, node health, sample incidents, controls, and attribution limitations."
+        evidence = ["PDF report uses the current illustrative demo snapshot", "Graphical risk movement is included", "Attribution limitations are documented"]
         next_steps = ["Export the PDF report", "Share it with the response team", "Attach preserved evidence separately"]
         suggested_action = "generate-report"
     elif any(word in message for word in ["solve", "fix", "recommend", "solution", "secure"]):
